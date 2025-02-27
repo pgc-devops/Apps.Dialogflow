@@ -53,6 +53,14 @@ export const incFallbackIntent = async (
 		const targetDepartmentName: string | undefined =
 			await getAppSettingValue(read, AppSetting.FallbackTargetDepartment);
 
+		// This setting was not required. However, the handover doesn't work without it (as the target department is not specified and the transfer requires a target agent/department)
+		// Since this app doesnt allow direct transfer to an agent, department becomes mandatory or the process fails.
+		if (!targetDepartmentName) {
+			throw new Error(
+				'No department specified for handover, cannot continue',
+			);
+		}
+
 		// Session Id from Dialogflow will be the same as Room id
 		await performHandover(
 			app,
