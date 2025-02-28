@@ -15,5 +15,76 @@
     "implements": [
         "IPostMessageSent",
         "IUIKitLivechatInteractionHandler"
+    ],
+    "permissions": [
+        {
+            "name": "livechat-department.multiple"
+        },
+        {
+            "name": "networking"
+        },
+        {
+            "name": "persistence"
+        },
+        {
+            "name": "api"
+        },
+        {
+            "name": "livechat-department.read"
+        },
+        {
+            "name": "livechat-room.write"
+        },
+        {
+            "name": "livechat-room.read"
+        },
+        {
+            "name": "livechat-message.write"
+        },
+        {
+            "name": "livechat-message.read"
+        },
+        {
+            "name": "livechat-visitor.write"
+        },
+        {
+            "name": "livechat-visitor.read"
+        },
+        {
+            "name": "livechat-status.read"
+        },
+        {
+            "name": "livechat-custom-fields.write"
+        },
+        {
+            "name": "message.write"
+        },
+        {
+            "name": "message.read"
+        },
+        {
+            "name": "room.write"
+        },
+        {
+            "name": "ui.interact"
+        },
+        {
+            "name": "room.read"
+        },
+        {
+            "name": "server-setting.read"
+        },
+        {
+            "name": "upload.write"
+        },
+        {
+            "name": "upload.read"
+        },
+        {
+            "name": "user.read"
+        },
+        {
+            "name": "user.write"
+        }
     ]
 }
