@@ -35,12 +35,7 @@ class DialogflowClass {
 		request: IDialogflowEvent | string,
 		requestType: DialogflowRequestType,
 	): Promise<IDialogflowMessage> {
-		const serverURL = await this.getServerURL(
-			read,
-			modify,
-			http,
-			sessionId,
-		);
+		const serverURL = await this.getServerURL(read);
 
 		const languageCode = await getAppSettingValue(read, AppSetting.DialogflowDefaultLanguage) || LanguageCode.EN;
 
@@ -53,16 +48,18 @@ class DialogflowClass {
 			},
 		};
 
+		const accessToken = await this.getAccessToken(read, modify, http, sessionId);
+
 		const httpRequestContent: IHttpRequest = createHttpRequest(
 			{
 				'Content-Type': Headers.CONTENT_TYPE_JSON,
-				Accept: Headers.ACCEPT_JSON,
+				'Authorization': `Bearer ${accessToken}`,
 			},
 			{ queryInput },
 		);
 
 		try {
-			const response = await http.post(serverURL, httpRequestContent);
+			const response = await http.post(`${serverURL}/sessions/${sessionId}:detectIntent`, httpRequestContent);
 			if (!response) {
 				throw new Error(
 					'Failed to get any response from the Dialogflow api. Please check if you server is able to connect to public n/w',
@@ -189,12 +186,7 @@ class DialogflowClass {
 		}
 	}
 
-	private async getServerURL(
-		read: IRead,
-		modify: IModify,
-		http: IHttp,
-		sessionId: string,
-	) {
+	private async getServerURL(read: IRead) {
 		const projectId = await getAppSettingValue(
 			read,
 			AppSetting.DialogflowProjectId,
@@ -204,20 +196,10 @@ class DialogflowClass {
 			AppSetting.DialogflowEnvironment,
 		);
 
-		const accessToken = await this.getAccessToken(
-			read,
-			modify,
-			http,
-			sessionId,
-		);
-		if (!accessToken) {
-			throw Error(Logs.ACCESS_TOKEN_ERROR);
-		}
-
-		return `https://dialogflow.googleapis.com/v2/projects/${projectId}/agent/environments/${environment}/users/-/sessions/${sessionId}:detectIntent?access_token=${accessToken}`;
+		return `https://dialogflow.googleapis.com/v2/projects/${projectId}/agent/environments/${environment}/users/-`;
 	}
 
-	private async getAccessToken(
+	public async getAccessToken(
 		read: IRead,
 		modify: IModify,
 		http: IHttp,
