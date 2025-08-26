@@ -6,7 +6,10 @@ import {
 
 export enum AppSetting {
 	DialogflowBotUsername = 'dialogflow_bot_username',
+	DialogflowApiVersion = 'dialogflow_api_version',
 	DialogflowProjectId = 'dialogflow_project_id',
+	DialogflowAgentId = 'dialogflow_agent_id',
+	DialogflowLocation = 'dialogflow_location',
 	DialogflowEnvironment = 'dialogflow_environment',
 	DialogflowClientEmail = 'dialogflow_client_email',
 	DialogFlowPrivateKey = 'dialogflow_private_key',
@@ -61,6 +64,11 @@ export const LanguageCode: Array<ISettingSelectValue> = [
 	{ key: 'uk', i18nLabel: 'Ukrainian' },
 ];
 
+export const ApiVersion: Array<ISettingSelectValue> = [
+	{ key: 'ES', i18nLabel: 'ES' },
+	{ key: 'CX', i18nLabel: 'CX' },
+];
+
 export const settings: Array<ISetting> = [
 	{
 		id: AppSetting.DialogflowBotUsername,
@@ -71,12 +79,41 @@ export const settings: Array<ISetting> = [
 		required: true,
 	},
 	{
+		id: AppSetting.DialogflowApiVersion,
+		public: true,
+		type: SettingType.SELECT,
+		values: ApiVersion,
+		packageValue: 'ES',
+		value: 'ES',
+		i18nLabel: 'dialogflow_api_version',
+		i18nDescription: 'dialogflow_api_version_description',
+		required: true,
+	},
+	{
 		id: AppSetting.DialogflowProjectId,
 		public: true,
 		type: SettingType.STRING,
 		packageValue: '',
 		i18nLabel: 'dialogflow_project_id',
 		required: true,
+	},
+	{
+		id: AppSetting.DialogflowAgentId,
+		public: true,
+		type: SettingType.STRING,
+		packageValue: '',
+		i18nLabel: 'dialogflow_agent_id',
+		i18nDescription: 'dialogflow_agent_id_description',
+		required: false,
+	},
+	{
+		id: AppSetting.DialogflowLocation,
+		public: true,
+		type: SettingType.STRING,
+		packageValue: '',
+		i18nLabel: 'dialogflow_location',
+		i18nDescription: 'dialogflow_location_description',
+		required: false,
 	},
 	{
 		id: AppSetting.DialogflowEnvironment,

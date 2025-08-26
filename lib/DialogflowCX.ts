@@ -7,7 +7,9 @@ import {
 import { AppSetting } from '../config/Settings';
 import {
     DialogflowRequestType,
+    IDialogflowEvent,
     IDialogflowMessage,
+    IDialogflowQuickReplies,
     LanguageCode,
 } from '../enum/Dialogflow';
 import { Logs } from '../enum/Logs';
@@ -19,7 +21,7 @@ class DialogflowCXClass {
         read: IRead,
         modify: IModify,
         sessionId: string,
-        request: string,
+        request: string | IDialogflowEvent,
         requestType: DialogflowRequestType,
     ): Promise<IDialogflowMessage> {
         const projectId = await getAppSettingValue(read, AppSetting.DialogflowProjectId);
@@ -35,7 +37,7 @@ class DialogflowCXClass {
         const client = new SessionsClient({
             credentials: {
                 client_email: clientEmail,
-                private_key: privateKey,
+                private_key: privateKey.replace(/\\n/g, '\n'),
             },
             apiEndpoint: `${location}-dialogflow.googleapis.com`,
         });
@@ -43,8 +45,15 @@ class DialogflowCXClass {
         const dialogflowRequest = {
             session: sessionPath,
             queryInput: {
-                text: {
-                    text: request,
+                ...requestType === DialogflowRequestType.MESSAGE && {
+                    text: {
+                        text: request as string,
+                    },
+                },
+                ...requestType === DialogflowRequestType.EVENT && {
+                    event: {
+                        event: (request as IDialogflowEvent).name,
+                    },
                 },
                 languageCode,
             },
@@ -52,23 +61,56 @@ class DialogflowCXClass {
 
         try {
             const [response] = await client.detectIntent(dialogflowRequest);
-            return this.parseRequest(response);
+            return this.parseRequest(response, sessionId);
         } catch (error) {
             throw new Error(`${Logs.DIALOGFLOW_REST_API_ERROR} ${ (error as Error).message }`);
         }
     }
 
-    public parseRequest(response: any): IDialogflowMessage {
+    public parseRequest(response: any, sessionId: string): IDialogflowMessage {
         const { queryResult } = response;
         const parsedMessage: IDialogflowMessage = {
             isFallback: false,
+            sessionId,
         };
 
         if (queryResult && queryResult.responseMessages) {
-            const messages: Array<string> = [];
+            const messages: Array<string | IDialogflowQuickReplies> = [];
             queryResult.responseMessages.forEach((message) => {
                 if (message.text) {
                     messages.push(message.text.text[0]);
+                }
+                if (message.payload) {
+                    const { richContent, ...payload } = message.payload;
+                    if (richContent) {
+                        richContent.forEach((richContentRow) => {
+                            richContentRow.forEach((richContentItem) => {
+                                if (richContentItem.type === 'info') {
+                                    messages.push({
+                                        title: richContentItem.title,
+                                        subtitle: richContentItem.subtitle,
+                                        image_url: richContentItem.image ? richContentItem.image.src.rawUrl : '',
+                                        buttons: richContentItem.actionLink ? [{
+                                            text: richContentItem.actionLink.text,
+                                            postback: richContentItem.actionLink.link,
+                                        }] : [],
+                                    });
+                                }
+                            });
+                        });
+                    }
+                    if (payload.quickReplies) {
+                        const { text: optionsText, options } = payload.quickReplies;
+                        if (optionsText && options) {
+                            messages.push(payload.quickReplies);
+                        }
+                    }
+                    if (payload.livechat) {
+                        parsedMessage.action = 'livechat-transfer';
+                    }
+                    if (payload.closeChat) {
+                        parsedMessage.action = 'close-chat';
+                    }
                 }
             });
             if (messages.length > 0) {

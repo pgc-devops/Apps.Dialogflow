@@ -13,6 +13,7 @@ import { AppSetting, DefaultMessage } from '../config/Settings';
 import { DialogflowRequestType, IDialogflowMessage } from '../enum/Dialogflow';
 import { Logs } from '../enum/Logs';
 import { Dialogflow } from '../lib/Dialogflow';
+import { DialogflowCX } from '../lib/DialogflowCX';
 import {
 	createDialogflowMessage,
 	createMessage,
@@ -71,14 +72,26 @@ export class PostMessageSentHandler {
 
 		let response: IDialogflowMessage;
 		try {
-			response = await Dialogflow.sendRequest(
-				this.http,
-				this.read,
-				this.modify,
-				rid,
-				messageText,
-				DialogflowRequestType.MESSAGE,
-			);
+			const apiVersion = await getAppSettingValue(this.read, AppSetting.DialogflowApiVersion);
+			if (apiVersion === 'CX') {
+				response = await DialogflowCX.sendRequest(
+					this.http,
+					this.read,
+					this.modify,
+					rid,
+					messageText,
+					DialogflowRequestType.MESSAGE,
+				);
+			} else {
+				response = await Dialogflow.sendRequest(
+					this.http,
+					this.read,
+					this.modify,
+					rid,
+					messageText,
+					DialogflowRequestType.MESSAGE,
+				);
+			}
 		} catch (error) {
 			this.app
 				.getLogger()

@@ -2,7 +2,7 @@
     "bot_username": "Bot Username",
     "dialogflow_project_id": "Project Id",
     "dialogflow_environment": "Environment",
-    "dialogflow_environment_description": "Define the environment which you want your bot to use. More info about the Dialogflow Environments can be found [here](https://cloud.google.com/dialogflow/es/docs/agents-versions)",
+    "dialogflow_environment_description": "Define the environment which you want your bot to use (ES only). More info about the Dialogflow Environments can be found [here](https://cloud.google.com/dialogflow/es/docs/agents-versions)",
     "dialogflow_client_email": "Client Email",
     "dialogflow_private_key": "Private Key",
     "dialogflow_fallback_responses_limit": "Fallback Responses Limit",
@@ -21,6 +21,14 @@
     "dialogflow_handover_failed_message_description": "The Bot will send this message to Visitor if the handover failed because no agents were online",
     "dialogflow_default_language": "Language",
     "dialogflow_default_language_description": "Define the language in which you'd be interacting with the Bot",
+
+    "dialogflow_api_version": "API Version",
+    "dialogflow_api_version_description": "Choose which Dialogflow API you're using",
+    "dialogflow_agent_id": "Agent Id",
+    "dialogflow_agent_id_description": "Provide Agent Id if you're using Dialogflow CX (CX only)",
+    "dialogflow_location": "Location",
+    "dialogflow_location_description": "Provide Location if you're using Dialogflow CX (CX only)",
+
     "dialogflow_chinese_simplified": "Chinese - Simplified",
     "dialogflow_danish": "Danish",
     "dialogflow_dutch": "Dutch",
