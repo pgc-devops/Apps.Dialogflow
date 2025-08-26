@@ -6,21 +6,12 @@ import {
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { AppSetting } from '../config/Settings';
 import {
+    DialogflowRequestType,
     IDialogflowMessage,
     LanguageCode,
 } from '../enum/Dialogflow';
 import { Logs } from '../enum/Logs';
 import { getAppSettingValue } from './Settings';
-
-interface IDetectIntentResponse {
-    queryResult?: {
-        responseMessages?: Array<{
-            text?: {
-                text?: Array<string>;
-            };
-        }>;
-    };
-}
 
 class DialogflowCXClass {
     public async sendRequest(
@@ -29,6 +20,7 @@ class DialogflowCXClass {
         modify: IModify,
         sessionId: string,
         request: string,
+        requestType: DialogflowRequestType,
     ): Promise<IDialogflowMessage> {
         const projectId = await getAppSettingValue(read, AppSetting.DialogflowProjectId);
         const agentId = await getAppSettingValue(read, AppSetting.DialogflowAgentId);
@@ -66,7 +58,7 @@ class DialogflowCXClass {
         }
     }
 
-    public parseRequest(response: IDetectIntentResponse): IDialogflowMessage {
+    public parseRequest(response: any): IDialogflowMessage {
         const { queryResult } = response;
         const parsedMessage: IDialogflowMessage = {
             isFallback: false,
